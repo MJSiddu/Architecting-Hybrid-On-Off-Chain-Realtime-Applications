@@ -5,9 +5,9 @@
 {
   "_id": "20343434995051",
   "vehicle_id": "23554dfd77hh343"
-	"entry_timestamp": 1575768689,
-	"parking_loc_id": "239499fdf939494",
-	"location": "sdsdsdsd"
+  "entry_timestamp": 1575768689,
+  "parking_loc_id": "239499fdf939494",
+  "location": "sdsdsdsd"
 }
 ```
 - Meanwhile, the consumer-producer, which is subscribed to the raw topic, will get these messages as an when it is published. It then goes on to process the data by hooking up with various other data sources and publishes the processed data to MongoDB. Currently, the proccessed data has the following structure
@@ -15,8 +15,8 @@
 {
   "_id": "20343434995051",
   "vehicle_id": "23554dfd77hh343"
-	"entry_timestamp": 1575768689,
-	"parking_loc_id": "239499fdf939494",
+  "entry_timestamp": 1575768689,
+  "parking_loc_id": "239499fdf939494",
   "location": "sdsdsdsd",
   "is_wanted": False,
   "rate_per_hour": 2,   //rate per hour is dynamic based on time of the day and location
@@ -28,9 +28,9 @@
 {
   "_id": "20343434995051",
   "vehicle_id": "23554dfd77hh343"
-	"exit_timestamp": 1575794626,
-	"parking_loc_id": "239499fdf939494",
-	"location": "sdsdsdsd"
+  "exit_timestamp": 1575794626,
+  "parking_loc_id": "239499fdf939494",
+  "location": "sdsdsdsd"
 }
 ```
 
