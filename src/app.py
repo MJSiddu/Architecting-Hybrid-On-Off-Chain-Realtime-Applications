@@ -1,40 +1,46 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
 from kafka import KafkaProducer
 from json import dumps
 import os
-from pymongo import MongoClient
+import hashlib
+import random
 
 app = Flask(__name__)
 
 load_dotenv()
-mongodb_uri = os.getenv('mongodb_uri')
-client = MongoClient(mongodb_uri)
-processed = client.kafka.processed
 
 @app.route('/')
 def home():
-  return 'App running on port: 3500'
+  return render_template('index.html')
 
+@app.route('/upload_processor', methods = ['POST'])
+def upload_processor():
+  code_file = request.files['code']
+  code = code_file.read()
+  dirname = os.path.dirname(__file__)
+  processors = os.path.join(dirname, '../processors')
+  filename = hashlib.sha256(str(random.getrandbits(256)).encode('utf-8')).hexdigest()[:12]
+  with open(processors + '/'+ filename + '.py', 'wb') as f:
+    f.write(code)
+    f.close()
+  return filename
+ 
 @app.route('/entry', methods = ['POST'])
 def process_entry():
   data = request.get_json()
   kafka_producer = get_producer()
-  raw = os.getenv('raw_topic')
-  publish_message(kafka_producer, raw, data)
+  entry = os.getenv('entry_topic')
+  publish_message(kafka_producer, entry, data)
   return jsonify(data)
 
 @app.route('/exit', methods = ['POST'])
 def process_exit():
-  new_data = request.get_json()
-  data = processed.find_one({"_id": new_data['_id']})
-  exit_time = new_data['exit_timestamp']
-  entry_time = data['entry_timestamp']
-  tot_amount = ((exit_time-entry_time)/60)*data['rate_per_hour']+data['accumulated_penalty']
-
-  #Call BigchainDB trnasaction function here. If the transaction suceeds, update fines and etc. If the transaction fails update accordingly
-
-  return {'tot_amount': tot_amount}
+  data = request.get_json()
+  kafka_producer = get_producer()
+  exit = os.getenv('exit_topic')
+  publish_message(kafka_producer, exit, data)
+  return jsonify(data)
 
 def publish_message(producer_instance, topic_name, data):
   try:
