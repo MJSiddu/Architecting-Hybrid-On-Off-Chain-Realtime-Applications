@@ -2,7 +2,7 @@ from bigchaindb_driver import BigchainDB
 from bigchaindb_driver.crypto import generate_keypair
 import re
 
-bdb_root_url = 'http://localhost:9984'
+bdb_root_url = 'https://test.ipdb.io/'
 
 class Currency(object):
     def __init__(self):
