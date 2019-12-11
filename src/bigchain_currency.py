@@ -35,8 +35,6 @@ class Currency(object):
             self.transaction_id_dict[u] = transaction_id
             transaction_id += 1
         
-        # user_key_list = tuple(user_key_list)
-        print(user_key_list)
         metadata={
             'metadata': currency_metadata
         }
@@ -65,7 +63,6 @@ class Currency(object):
         # self.output = fulfilled_token_tx['outputs'][self.output_index]
         self.output = fulfilled_token_tx['outputs']
 
-    # transfer is a plain transfer using assets in bigchain db
     def transfer(self, from_string, to_string, amount):
         currency = self.bdb.metadata.get(search='currency')
         latest_value = str(currency[-1]['metadata']['metadata'])
@@ -99,8 +96,6 @@ class Currency(object):
         self.bdb.transactions.send_commit(fulfilled_token_tx)
 
         return True
-
-        
 
     def transfer1(self, from_string, to_string, amount):
         global transaction_id
@@ -136,7 +131,7 @@ class Currency(object):
         transfer_input = {'fulfillment': condition,
             # 'fulfills': {'output_index': self.output_index,
             'fulfills': {'output_index': 0,
-                        # 'transaction_id': self.transfer_asset['id']
+                        'transaction_id': self.transfer_asset['id']
                         },
             'owners_before': [user_from.public_key]}
 
@@ -182,12 +177,12 @@ class Currency(object):
         currency = self.bdb.metadata.get(search='currency')
         print(currency[-1]['metadata']['metadata'])
 
-if __name__ == '__main__':
-    users = ['ani', 'abc', 'def', 'hij']
+# if __name__ == '__main__':
+#     users = ['ani', 'abc', 'def', 'hij']
     
-    cur = Currency(users)
-    cur.transfer('ani', 'abc', 6)
-    cur.transfer('def', 'hij', 4)
-    cur.transfer('abc', 'def', 3)
-    cur.show_users()
+#     cur = Currency(users)
+#     cur.transfer('ani', 'abc', 6)
+#     cur.transfer('def', 'hij', 4)
+#     cur.transfer('abc', 'def', 3)
+#     cur.show_users()
     
