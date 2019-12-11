@@ -30,16 +30,11 @@ def connect_kafka_producer():
 if __name__ == '__main__':
   load_dotenv()
   servers = os.getenv('kafka-servers')
-  raw_topic = os.getenv('raw_topic')
-  processed_topic=os.getenv('processed_topic')
-  mongodb_uri = os.getenv('mongodb_uri')
+  tx_topic = os.getenv('tx_topic')
 
-  client = MongoClient(mongodb_uri)
-  collection = client.kafka.processed
-
-  # Read data from the raw data topic
+  # Read data from the transaction data topic
   consumer = KafkaConsumer(
-    raw_topic,
+    tx_topic,
     bootstrap_servers=[servers],
     auto_offset_reset='earliest',
     enable_auto_commit=True,
@@ -47,22 +42,7 @@ if __name__ == '__main__':
     value_deserializer=lambda x: loads(x.decode('utf-8')))
 
   producer = connect_kafka_producer()
+
   for message in consumer:
-    data = message.value
-
-    # Process raw data below. Check for violations, per hour rate based on location and time, criminal offenses etc against a public database and update the object. For example
-    data['is_wanted'] = False
-    data['rate_per_hour'] = 2
-    data['accumulated_penalty'] = 100
-
-    # if data['is_wanted']:
-    #   Call law enforcement API
-
-    # Insert record to mongodb
-    collection.insert_one(data)
-
-    # Write the data to a proceesed data topic, if required by other consumers.
-    # publish_message(producer, processed_topic, data)
-    
-    print(data)
-      
+    tx_data = message.value
+    print(tx_data)
