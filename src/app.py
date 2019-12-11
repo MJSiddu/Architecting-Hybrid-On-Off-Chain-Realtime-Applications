@@ -30,7 +30,7 @@ def process_exit():
   data = processed.find_one({"_id": new_data['_id']})
   exit_time = new_data['exit_timestamp']
   entry_time = data['entry_timestamp']
-  tot_amount = ((exit_time-entry_time)/60)*data['rate_per_hour']+data['accumulated_fines']
+  tot_amount = ((exit_time-entry_time)/60)*data['rate_per_hour']+data['accumulated_penalty']
 
   #Call BigchainDB trnasaction function here. If the transaction suceeds, update fines and etc. If the transaction fails update accordingly
 
