@@ -26,7 +26,7 @@ class Currency(object):
         create_receipents = []
         user_key_list = []
         self.transaction_id_dict = {}
-        currency_metadata = "currency :"
+        currency_metadata = "currencyTransaction :"
         for u in user_list:
             self.users[u] = generate_keypair()
             currency_metadata += u + "=" + str(100) + ","
@@ -62,9 +62,10 @@ class Currency(object):
         # self.output_index = 3
         # self.output = fulfilled_token_tx['outputs'][self.output_index]
         self.output = fulfilled_token_tx['outputs']
+        print('initialization successful')
 
     def transfer(self, from_string, to_string, amount):
-        currency = self.bdb.metadata.get(search='currency')
+        currency = self.bdb.metadata.get(search='currencyTransaction')
         latest_value = str(currency[-1]['metadata']['metadata'])
 
         from_acc_balance = self.get_current_balance(from_string)
@@ -101,7 +102,7 @@ class Currency(object):
         global transaction_id
         user_from = self.users[from_string]
         user_to = self.users[to_string]
-        currency = self.bdb.metadata.get(search='currency')
+        currency = self.bdb.metadata.get(search='currencyTransaction')
         latest_value = str(currency[-1]['metadata']['metadata'])
         op_id = self.transaction_id_dict[from_string]
         # print(op_id)
@@ -161,7 +162,7 @@ class Currency(object):
         return True  
 
     def get_current_balance(self, user):
-        currency = self.bdb.metadata.get(search='currency')
+        currency = self.bdb.metadata.get(search='currencyTransaction')
         latest_val = str(currency[-1]['metadata']['metadata'])
 
         expr = user + '=(\d+)'
@@ -174,15 +175,18 @@ class Currency(object):
 
     # show_users will print the metadata for the currency asset    
     def show_users(self):
-        currency = self.bdb.metadata.get(search='currency')
+        currency = self.bdb.metadata.get(search='currencyTransaction')
         print(currency[-1]['metadata']['metadata'])
 
-# if __name__ == '__main__':
-#     users = ['ani', 'abc', 'def', 'hij']
+if __name__ == '__main__':
+    users = ['Vehicle1', 'Sensor1']
     
-#     cur = Currency(users)
-#     cur.transfer('ani', 'abc', 6)
-#     cur.transfer('def', 'hij', 4)
-#     cur.transfer('abc', 'def', 3)
-#     cur.show_users()
+    cur = Currency(users)
+    cur.show_users()
+
+    cur.transfer("Sensor1", "Vehicle1", 90)
+    # cur.transfer('ani', 'abc', 6)
+    # cur.transfer('def', 'hij', 4)
+    # cur.transfer('abc', 'def', 3)
+    cur.show_users()
     
