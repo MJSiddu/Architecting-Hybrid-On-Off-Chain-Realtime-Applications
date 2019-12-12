@@ -56,8 +56,8 @@ if __name__ == '__main__':
 
   for message in consumer:
     exit_data = message.value
-    entry_data = collection.find({"_id":exit_data['_id']})
-    module_name = exit_data['processor']
+    entry_data = collection.find_one({"_id":exit_data['_id']})
+    module_name = exit_data['processor_id']
     proc = importlib.import_module(module_name)
     processed_data = proc.process(entry_data, exit_data)
     publish_message(producer, tx_topic, processed_data)
