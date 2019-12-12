@@ -40,6 +40,7 @@ Pre-req
 - Kafka
 - MongoDB
 - Anaconda (recommended)
+- BigchainDB (Optional)
 
 1. Git clone
 2. cd to directory
@@ -52,3 +53,24 @@ Pre-req
 7. Run consumer-producer.py in another terminal
    - python src/consumer-producer.py
 8. Send entry and exit requests from Postman. Update the _id parameter of the entry request body to avoid having issues with mongodb. Result of the exit request will show the total parking amount.
+
+### BigchainDB setup
+The current code points to a publically running bigchaindb instance at : 'https://test.ipdb.io/'.
+If bigchaindb needs to be ran locally, follow the following steps:
+1. Install Git, Make, Docker, and Docker Compose on your local machine.
+2. `git clone git@github.com:bigchaindb/bigchaindb.git`
+3. `cd bigchaindb`
+4. `make run`
+
+For bringing down the blockchain instance,
+1. `cd bigchaindb`
+2. `docker-compose down -v`
+
+All the methods to create and transact a Currency are present in src/bigchain_currency.py
+
+Following were used as a reference for building bigchain currency:
+* [Testnet](https://blog.bigchaindb.com/the-status-of-the-bigchaindb-testnet-90d446edd2b4)
+* [BigchainDB](http://docs.bigchaindb.com/en/latest/index.html)
+* [Divisible Assets](http://docs.bigchaindb.com/projects/py-driver/en/latest/usage.html#divisible-assets)
+
+
