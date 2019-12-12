@@ -6,6 +6,7 @@ import os
 from kafka import KafkaProducer
 from json import dumps
 from pymongo import MongoClient
+import bigchain_currency as bc
 
 def publish_message(producer_instance, topic_name, data):
   try:
@@ -42,7 +43,10 @@ if __name__ == '__main__':
     value_deserializer=lambda x: loads(x.decode('utf-8')))
 
   producer = connect_kafka_producer()
-
+  cur = bc.Currency(["Vehicle1", "Sensor1"])
+  
   for message in consumer:
     tx_data = message.value
     print(tx_data)
+    res = cur.transfer(tx_data['from_id'],tx_data['to_id'],tx_data['tot_amount'])
+    print(res)
