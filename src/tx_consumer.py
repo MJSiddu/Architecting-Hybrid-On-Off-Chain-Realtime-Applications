@@ -43,10 +43,15 @@ if __name__ == '__main__':
     value_deserializer=lambda x: loads(x.decode('utf-8')))
 
   producer = connect_kafka_producer()
-  cur = bc.Currency(["Vehicle1", "Sensor1"])
+  cur = bc.Currency(["Vehicle", "Sensor", "Customer", "Supermarket"])
   
   for message in consumer:
     tx_data = message.value
     print(tx_data)
+    cur.show_users()
     res = cur.transfer(tx_data['from_id'],tx_data['to_id'],tx_data['tot_amount'])
-    print(res)
+    cur.show_users()
+    if res:
+      print("Transaction Status: PASS\n")
+    else:
+      print("Transaction Status: FAIL\n")

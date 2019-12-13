@@ -62,7 +62,7 @@ class Currency(object):
         # self.output_index = 3
         # self.output = fulfilled_token_tx['outputs'][self.output_index]
         self.output = fulfilled_token_tx['outputs']
-        print('initialization successful')
+        # print('initialization successful')
 
     def transfer(self, from_string, to_string, amount):
         currency = self.bdb.metadata.get(search='currencyTransaction')
@@ -178,15 +178,15 @@ class Currency(object):
         currency = self.bdb.metadata.get(search='currencyTransaction')
         print(currency[-1]['metadata']['metadata'])
 
-if __name__ == '__main__':
-    users = ['Vehicle1', 'Sensor1']
+# if __name__ == '__main__':
+#     users = ['Vehicle1', 'Sensor1']
     
-    cur = Currency(users)
-    cur.show_users()
+#     cur = Currency(users)
+#     cur.show_users()
 
-    cur.transfer("Sensor1", "Vehicle1", 90)
-    # cur.transfer('ani', 'abc', 6)
-    # cur.transfer('def', 'hij', 4)
-    # cur.transfer('abc', 'def', 3)
-    cur.show_users()
+#     cur.transfer("Sensor1", "Vehicle1", 90)
+#     # cur.transfer('ani', 'abc', 6)
+#     # cur.transfer('def', 'hij', 4)
+#     # cur.transfer('abc', 'def', 3)
+#     cur.show_users()
     
