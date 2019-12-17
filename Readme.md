@@ -1,7 +1,7 @@
 # Hybrid on and off chain Real Time Platform
 ## Flow
 
-- When a vehicle enters, it sensor sends a post request to the /entry api of the app, which in turn published the entry record to the raw topic of the kafka cluster. The request body has the following structure
+- When a vehicle enters, the sensor sends a post request to the **/entry** api of the app, which in turn published the entry record to the raw topic of the kafka cluster. The request body has the following structure
 ```javascript
 {
   "_id": "20343434995051",
@@ -24,7 +24,7 @@
   "accumulated_penalty": 50
 }
 ```
-- When the vehicle leaves, the sensor sends a post request to the /exit endpoint of the app, which then fetches the processed record of that vehicle and calcuates the total amount due based on the exit timestamp and the accumulated penalty. A transaction wil be then attempted on the blockchain and is handled accordingly. The post body request has the following structure
+- When the vehicle leaves, the sensor sends a post request to the **/exit** endpoint of the app, which then fetches the processed record of that vehicle and calcuates the total amount due based on the exit timestamp and the accumulated penalty. A transaction wil be then attempted on the blockchain and is handled accordingly. The post body request has the following structure
 ```javascript
 {
   "_id": "20343434995051",
@@ -37,35 +37,65 @@
 
 ## Setup
 
-Pre-req
+### Pre-requisites
 - Kafka
 - MongoDB
 - Anaconda (recommended)
 - BigchainDB (Optional)
 
-1. Git clone
+1. Git clone this repository
 2. cd to directory
-3. conda env create -f environment.yml
-4. conda activate realtime-app (exact command might not work, if it doesn't change accordingly)
+3. Create environment
+```
+conda env create -f environment.yml
+```
+4. Activate the environment (exact command might not work, if it doesn't change accordingly)
+```
+conda activate realtime-app
+```
 5. create .env and set the config
 6. Run flask app in one terminal
-   - python src/app.py or
-   - FLASK_APP=src/app.py FLASK_ENV=development flask run --port 3500 (for hot reloading)
+```
+$ python src/app.py
+```
+or
+```
+$ FLASK_APP=src/app.py FLASK_ENV=development flask run --port 3500
+``` 
+for hot reloading
+
 7. Run consumer-producer.py in another terminal
-   - python src/consumer-producer.py
-8. Send entry and exit requests from Postman. Update the _id parameter of the entry request body to avoid having issues with mongodb. Result of the exit request will show the total parking amount.
+```
+python src/consumer-producer.py
+```
+8. Send entry and exit requests from Postman. Update the **_id** parameter of the entry request body to avoid having issues with mongodb. Result of the exit request will show the total parking amount.
 
 ### BigchainDB setup
-The current code points to a publically running bigchaindb instance at : 'https://test.ipdb.io/'.
-If bigchaindb needs to be ran locally, follow the following steps:
+The current code points to a publically running bigchaindb instance called [testnet](https://test.ipdb.io/ "testnet")
+Follow the following steps to run Bigchaindb locally
 1. Install Git, Make, Docker, and Docker Compose on your local machine.
-2. `git clone git@github.com:bigchaindb/bigchaindb.git`
-3. `cd bigchaindb`
-4. `make run`
+2. Clone the following repository
+```
+git clone git@github.com:bigchaindb/bigchaindb.git
+```
+3. Change directory
+```
+cd bigchaindb
+```
+4. Run bigchaindb
+```
+make run
+```
 
 For bringing down the blockchain instance,
-1. `cd bigchaindb`
-2. `docker-compose down -v`
+1. Change directory to bigchain db
+```
+cd bigchaindb
+```
+2. Bring down bigchaindb containers
+```
+docker-compose down -v
+```
 
 All the methods to create and transact a Currency are present in src/bigchain_currency.py
 
