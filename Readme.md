@@ -1,3 +1,4 @@
+# Hybrid on and off chain Real Time Platform
 ## Flow
 
 - When a vehicle enters, it sensor sends a post request to the /entry api of the app, which in turn published the entry record to the raw topic of the kafka cluster. The request body has the following structure
