@@ -1,5 +1,11 @@
 # Hybrid on and off chain Platform for Real Time Applications
 
+## Team Members
+- Amal Sony (asony)
+- Aniruddha Shamasundar (ashamas)
+- Harsh Agrawal (hagrawa2)
+- Siddu Madhure Jayanna (smadhur)
+
 ## Setup
 
 ### Pre-requisites
