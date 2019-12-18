@@ -6,46 +6,46 @@
 - Harsh Agrawal (hagrawa2)
 - Siddu Madhure Jayanna (smadhur)
 
-## Setup
-
-### Pre-requisites
+## Pre-requisites
 - Kafka
 - MongoDB
 - Anaconda (recommended)
 - BigchainDB (Optional)
 
-1. Git clone this repository
-2. cd to directory
-3. Create environment
-```
-conda env create -f environment.yml
-```
-4. Activate the environment (exact command might not work, if it doesn't change accordingly)
-```
-conda activate realtime-app
-```
-5. create .env and set the config
-6. Run flask app in one terminal
-```
-$ python src/app.py
-```
-or
-```
-$ FLASK_APP=src/app.py FLASK_ENV=development flask run --port 3500
-``` 
-for hot reloading
+## Setup
 
-7. Run the following consumers in separate terminals
-```
-python src/entry_consumer.py
-```
-```
-python src/exit_consumer.py
-```
-```
-python src/tx_consumer.py
-```
-8. Send entry and exit requests from Postman. Update the **_id** parameter of the entry request body to avoid having issues with mongodb. Result of the exit request will show the total parking amount.
+1. Git clone this repository or extract the zip file.
+2. cd to folder.
+3. Create environment
+    ```
+    conda env create -f environment.yml
+    ```
+4. Activate the environment (exact command might not work, if it doesn't change accordingly)
+    ```
+    conda activate realtime-app
+    ```
+5. Run kafka and create three topics namely entry, exit and tx.
+6. Create .env in the project root folder and set the config appropriately. Seen .env.example for reference. The topic names should be the ones created in step 5.
+7. Run flask app in one terminal
+    ```
+    python src/app.py
+    ```
+    or
+    ```
+    FLASK_APP=src/app.py FLASK_ENV=development flask run --port 3500, (for hot reloading)
+    ``` 
+8. Run the following consumers in separate terminals
+    ```
+    python src/entry_consumer.py
+    ```
+    ```
+    python src/exit_consumer.py
+    ```
+    ```
+    python src/tx_consumer.py
+    ```
+9. Create accounts in the blockchain for users/entities. For now, it done inside the code. Open tx_consumer.py and edit this line ```cur = bc.Currency(["Vehicle", "Sensor", "Customer", "Supermarket"])```. The inputs are the accounts to be created. The same account identifiers specified here should be given as the part of the request, which is explained further in the Flow section.
+9. Send entry and exit requests from Postman. Update the **\_id** parameter of the entry request body to avoid having issues with mongodb. For details on the request body structure, refer the Flow section below.
 
 ### BigchainDB setup
 The current code points to a publically running bigchaindb instance called [testnet](https://test.ipdb.io/ "testnet")
