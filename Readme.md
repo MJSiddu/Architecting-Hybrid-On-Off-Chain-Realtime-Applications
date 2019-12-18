@@ -1,39 +1,4 @@
-# Hybrid on and off chain Real Time Platform
-## Flow
-
-- When a vehicle enters, the sensor sends a post request to the **/entry** api of the app, which in turn published the entry record to the raw topic of the kafka cluster. The request body has the following structure
-```javascript
-{
-  "_id": "20343434995051",
-  "vehicle_id": "23554dfd77hh343"
-  "entry_timestamp": 1575768689,
-  "parking_loc_id": "239499fdf939494",
-  "location": "sdsdsdsd"
-}
-```
-- Meanwhile, the consumer-producer, which is subscribed to the raw topic, will get these messages as an when it is published. It then goes on to process the data by hooking up with various other data sources and publishes the processed data to MongoDB. Currently, the proccessed data has the following structure
-```javascript
-{
-  "_id": "20343434995051",
-  "vehicle_id": "23554dfd77hh343"
-  "entry_timestamp": 1575768689,
-  "parking_loc_id": "239499fdf939494",
-  "location": "sdsdsdsd",
-  "is_wanted": False,
-  "rate_per_hour": 2,   //rate per hour is dynamic based on time of the day and location
-  "accumulated_penalty": 50
-}
-```
-- When the vehicle leaves, the sensor sends a post request to the **/exit** endpoint of the app, which then fetches the processed record of that vehicle and calcuates the total amount due based on the exit timestamp and the accumulated penalty. A transaction wil be then attempted on the blockchain and is handled accordingly. The post body request has the following structure
-```javascript
-{
-  "_id": "20343434995051",
-  "vehicle_id": "23554dfd77hh343"
-  "exit_timestamp": 1575794626,
-  "parking_loc_id": "239499fdf939494",
-  "location": "sdsdsdsd"
-}
-```
+# Hybrid on and off chain Platform for Real Time Applications
 
 ## Setup
 
@@ -64,9 +29,15 @@ $ FLASK_APP=src/app.py FLASK_ENV=development flask run --port 3500
 ``` 
 for hot reloading
 
-7. Run consumer-producer.py in another terminal
+7. Run the following consumers in separate terminals
 ```
-python src/consumer-producer.py
+python src/entry_consumer.py
+```
+```
+python src/exit_consumer.py
+```
+```
+python src/tx_consumer.py
 ```
 8. Send entry and exit requests from Postman. Update the **_id** parameter of the entry request body to avoid having issues with mongodb. Result of the exit request will show the total parking amount.
 
@@ -103,5 +74,58 @@ Following were used as a reference for building bigchain currency:
 * [Testnet](https://blog.bigchaindb.com/the-status-of-the-bigchaindb-testnet-90d446edd2b4)
 * [BigchainDB](http://docs.bigchaindb.com/en/latest/index.html)
 * [Divisible Assets](http://docs.bigchaindb.com/projects/py-driver/en/latest/usage.html#divisible-assets)
+
+## Flow
+
+Any user of the platform has to upload their stream processing logic. To upload go to ```/``` endpoint and upload the file. If the server is deployed locally, the url would be ```http://localhost:3500/```. After a successful upload, a key will be shown on screen. Make note of this key. The use of this key is explained below. This file must have a 'process' function. A sample process function with the required function signature is shown below.
+```
+def process(entry_data,exit_data):
+  data = dict(exit_data)
+  data[‘entry_timestamp’] = entry_data[‘entry_timestamp']
+  data['isWanted'] = <get data from law enforcement database>
+  data['accumulated_penalty'] = <get data from violations database>
+  data['rate_per_hour'] = 10
+  data['tot_amount'] = (data['exit_timestamp']-data['entry_timestamp']) * data['rate_per_hour'] +data['accumulated_penalty']
+  return data
+```
+
+The process function has two inputs: entry_data and exit_data. These two inputs represent the entry stream and the exit stream respectively. The platform supports applications that generates a maximum of two streams. For applications that generate only one stream point it to the exit stream. Two streams makes sense, for example, in the case of a parking lot application. This application will have one stream of incoming cars and one stream of outgoing cars. To calculate the parking charge, we need data from both the streams ie, when the vehicle entered and when the vehicle exited. In this case, point the entry stream (ie send a post request) to the **/entry** endpoint of the platform and point the exit stream to **/exit** endpoint of the platform.
+
+The result of the processing should always be the amount to be transferred between the accounts and it should be put into the **tot_amount** field as shown above ie, the data returned by the process function should always have a tot_amount field.
+
+For applications that generate only one stream, for example, in the case of a shopping application, the only stream generated is on the customer orders and this stream has enough information to calulate the total amount for a user. In this case point this stream to the /exit endpoint. Further, in the process function, ignore the entry_data input as it will be null.
+
+When sending post requests to the /entry or /exit endpoint, the data should contain a minimum of four fields. They are **\_id**, **from_id**, **to_id**, **porcessor_id** followed by application specific data. \_id is the transaction id, from_id is the blockchain account number of the sender/customer/account from which money should be debited, to_id is the blocchain account number of the receiver/account to which the mone should be credited and processor_id is the id of the processor to be executed. This should set to the value that is returned after uploading stream processor the file mentioned earlier.
+
+The example below for a parking application shows the flow.
+
+- When a vehicle enters, the sensor sends a post request to the **/entry** api of the platform. The request body has the following structure
+```javascript
+{
+  "_id": "20343434995051",
+  "from_id": "0xsf34343uu44",
+  "to_id": "0zdsfdhf8883434",
+  "processor_id": "94ndsjsf933",
+  "vehicle_id": "23554dfd77hh343",
+  "entry_timestamp": 1575768689,
+  "parking_loc_id": "239499fdf939494",
+  "location": "sdsdsdsd"
+}
+```
+- When the vehicle leaves, the sensor sends a post request to the **/exit** endpoint of the app. The request body has the following structure
+```javascript
+{
+  "_id": "20343434995051",
+  "from_id": "0xsf34343uu44",
+  "to_id": "0zdsfdhf8883434",
+  "processor_id": "94ndsjsf933",
+  "vehicle_id": "23554dfd77hh343",
+  "exit_timestamp": 1575768689,
+  "parking_loc_id": "239499fdf939494",
+  "location": "sdsdsdsd"
+}
+```
+
+When the /exit api is triggered, it executes the corresponding processor refereced in the request body which then generates the processed data which will have the amount to be transferred in the 'tot_amount' field. After this a transaction will be attempted in the bigchain DB which will tranfer the amount between the accounts. The result of the transaction is printed in the terminal running the tx_consumer.py.
 
 
